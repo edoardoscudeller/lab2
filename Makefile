@@ -1,16 +1,15 @@
-COMPILE_OPTIONS = -Wall -Wfatal-errors -O3
+BASIC_DATA_DIR = ../InputData
+FRAMEWORK_DIR = ../../EnumerationFramework/Version2Opt
+COMPILE_OPTIONS = -I$(BASIC_DATA_DIR) -I$(FRAMEWORK_DIR) -Wall -O3 -std=c++11
 
-TestWLEnumeration.exe: TestWLEnumeration.o WL_Enumeration.o WL_Data.o
-	g++ -o TestWLEnumeration.exe TestWLEnumeration.o WL_Enumeration.o WL_Data.o
+TestBusSchedulingOpt.exe: TestBusSchedulingOpt.o EnumerationBusSchedulingOpt.o
+	g++ -o TestBusSchedulingOpt.exe TestBusSchedulingOpt.o EnumerationBusSchedulingOpt.o $(BASIC_DATA_DIR)/BDS_Data.o
 
-TestWLEnumeration.o: WL_Enumeration.hh EnumerationOpt.hh WL_Data.hh TestWLEnumeration.cc
-	g++ -c $(COMPILE_OPTIONS) TestWLEnumeration.cc
+TestBusSchedulingOpt.o: EnumerationBusSchedulingOpt.hh TestBusSchedulingOpt.cc
+	g++ -c $(COMPILE_OPTIONS) TestBusSchedulingOpt.cc
 
-WL_Enumeration.o: WL_Enumeration.hh WL_Data.hh WL_Enumeration.cc
-	g++ -c $(COMPILE_OPTIONS) WL_Enumeration.cc
-
-WL_Data.o: WL_Data.cc WL_Data.hh
-	g++ -c $(COMPILE_OPTIONS) -c WL_Data.cc
+EnumerationBusSchedulingOpt.o: EnumerationBusSchedulingOpt.hh EnumerationBusSchedulingOpt.cc
+	g++ -c $(COMPILE_OPTIONS) EnumerationBusSchedulingOpt.cc
 
 clean:
-	rm -f TestWLEnumeration.exe TestWLEnumeration.o WL_Enumeration.o WL_Data.o
+	rm -f TestBusSchedulingOpt.exe TestBusSchedulingOpt.o EnumerationBusSchedulingOpt.o
