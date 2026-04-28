@@ -105,47 +105,83 @@ ostream& operator<<(ostream& os, const WL_Input& in)
 
 WL_Output::WL_Output(const WL_Input& my_in)
   : in(my_in), assignment(in.Stores(),-1), 
-    load(in.Warehouses(),0)
+    load(in.Warehouses(),0),
+
+    // ADD:
+    cost(0), violations(0)
 {}
 
 WL_Output& WL_Output::operator=(const WL_Output& out)
 {
   assignment = out.assignment;
   load = out.load;
+
+  // ADD:
+  cost = out.cost;
+  violations = out.violations;
+
   return *this;
 }
 
 void WL_Output::Assign(unsigned s, unsigned w)
 {
-  int w_old = assignment[s];
+//   int w_old = assignment[s];
   
+//   if (w_old != -1)
+//     load[w_old] -= in.AmountOfGoods(s);
+//   assignment[s] = w;
+//   load[w] += in.AmountOfGoods(s);
+
+// ADD:
+  int w_old = assignment[s];
+
   if (w_old != -1)
+  {
+    cost -= in.AmountOfGoods(s) * in.SupplyCost(s, w_old);
+    if (load[w_old] > in.Capacity(w_old)) 
+      violations--;
+    if (load[w_old] == in.AmountOfGoods(s))  // if the warehouse is empty
+      cost -= in.FixedCost(w_old);                  // 
     load[w_old] -= in.AmountOfGoods(s);
-  assignment[s] = w;
+    if (load[w_old] > in.Capacity(w_old)) 
+      violations++;
+  }
+
+  if (load[w] > in.Capacity(w)) 
+    violations--;
+  if (load[w] == 0)  // il magazzino si apre
+    cost += in.FixedCost(w);
   load[w] += in.AmountOfGoods(s);
+  cost += in.AmountOfGoods(s) * in.SupplyCost(s, w);
+  if (load[w] > in.Capacity(w)) 
+  violations++;
+
+  assignment[s] = w;
 }
 
 unsigned WL_Output::ComputeCost() const
 {
-  unsigned s, w, cost = 0;
-  for (s = 0; s < in.Stores(); s++)
-    {
-      w = assignment[s];
-      cost += in.AmountOfGoods(s) * in.SupplyCost(s,w);
-    }
-  for (w = 0; w < in.Warehouses(); w++)
-    if (load[w] > 0)
-      cost += in.FixedCost(w);
   return cost;
+  // unsigned s, w, cost = 0;
+  // for (s = 0; s < in.Stores(); s++)
+  //   {
+  //     w = assignment[s];
+  //     cost += in.AmountOfGoods(s) * in.SupplyCost(s,w);
+  //   }
+  // for (w = 0; w < in.Warehouses(); w++)
+  //   if (load[w] > 0)
+  //     cost += in.FixedCost(w);
+  // return cost;
 }
 
 unsigned WL_Output::ComputeViolations() const
 {
-  unsigned w, violations = 0;
-  for (w = 0; w < in.Warehouses(); w++)
-    if (load[w] > in.Capacity(w))
-      violations++;
   return violations;
+  // unsigned w, violations = 0;
+  // for (w = 0; w < in.Warehouses(); w++)
+  //   if (load[w] > in.Capacity(w))
+  //     violations++;
+  // return violations;
 }
 
 ostream& operator<<(ostream& os, const WL_Output& out)
