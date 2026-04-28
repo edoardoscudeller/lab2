@@ -41,7 +41,11 @@ public:
   unsigned ComputeViolations() const;
 private:
   const WL_Input& in;
-  vector<int> assignment;   // warehouse assigned to the store (-1 for unassigned)
-  vector<unsigned> load; // load assigned to the warehouse
+  vector<int> assignment;
+  vector<unsigned> load;
+
+  // ADD:
+  unsigned cost;
+  unsigned violations;
 };
 #endif
